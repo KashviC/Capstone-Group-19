@@ -16,6 +16,8 @@ import madmom
 import threading
 import multiprocessing as mp
 from multiprocessing import Process
+from scipy.io import wavfile
+rate,refaudio=wavfile.read("riptide.wav")
 FORMAT = pyaudio.paInt16
 CHANNELS = 2#set this to the channel number of recording device can be found using pyaudio commands
 RATE = 44100 #set this to the sampling rate of recording device can be found using pyaudio commands
@@ -34,7 +36,7 @@ def callback(in_data, frame_count, time_info,status):
     #data = data.tolist()
     #q.appendleft(data)
     
-    if len([item for sublist in bytes_q for item in sublist])>250000:
+    if len([item for sublist in bytes_q for item in sublist])>100000:
         #print(len([item for sublist in bytes_q for item in sublist]))
         del bytes_q[0]
     return None, pyaudio.paContinue
@@ -61,13 +63,13 @@ def calculatechords(save,chordsls):
     print(chords)
     return()
 
+feats = feat_processor(np.frombuffer(refaudio, dtype=np.int16))
+actual = recog_processor(feats)
 threads=[]        
 if __name__ == '__main__':
     time.sleep(1)
     for i in range(1):
         save=bytes_q
-        feats = feat_processor(np.frombuffer(b''.join(save), dtype=np.int16)[::2])
-        chords = recog_processor(feats)
         threads.append(Process(target=calculatechords, args=(save,chordsls)))
         threads[i].start()
         time.sleep(.1)
