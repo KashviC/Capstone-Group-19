@@ -17,9 +17,11 @@ if __name__ == '__main__':
         try:
             if chordsls.qsize()>0:
                 for i in range(chordsls.qsize()):
+                    start_time= datetime.now()
+                    print(start_time)
                     print(chordsls.get())
-                    #
-                    print(np_array)
+                    
+                    #print(np_array)
     
         except:
             print("empty")

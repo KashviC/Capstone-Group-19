@@ -68,7 +68,7 @@ def enclosedthread(chordsls,shr_name):
     def callback(in_data, frame_count, time_info,status):
         bytes_q.append(in_data)
         
-        if len([item for sublist in bytes_q for item in sublist])>200000:
+        if len([item for sublist in bytes_q for item in sublist])>150000:
             #print(len([item for sublist in bytes_q for item in sublist]))
             del bytes_q[0]
         return None, pyaudio.paContinue
@@ -88,14 +88,14 @@ def enclosedthread(chordsls,shr_name):
         save=bytes_q
         #print(len(save))
         #sys.stdout.flush()
-        start_time= datetime.now()
-        feats = feat_processor(np.frombuffer(b''.join(save), dtype=np.int16)[::4])
-        end1=datetime.now()
-        print(  start_time)
+        #start_time= datetime.now()
+        feats = feat_processor(np.frombuffer(b''.join(save), dtype=np.int16)[::])
+        #end1=datetime.now()
+        #print(  start_time)
         chords = recog_processor(feats)
-        print( datetime.now() - end1)
-        print( chords)
-        sys.stdout.flush()
+        #print( datetime.now() - end1)
+        #print( chords)
+        #sys.stdout.flush()
 
-        #chordsls.put(chords)
+        chordsls.put(chords)
 
