@@ -31,7 +31,7 @@ import scipy.signal as sps
 #feat_processor = madmom.features.chords.CNNChordFeatureProcessor()
 #recog_processor = madmom.features.chords.CRFChordRecognitionProcessor()
 feat_processor=DeepChromaProcessor()
-recog_processor=madmom.features.chords.DeepChromaChordRecognitionProcessor(fps=20)
+recog_processor=madmom.features.chords.DeepChromaChordRecognitionProcessor(fps=80)
 FORMAT = pyaudio.paInt16
 CHANNELS = 2#set this to the channel number of recording device can be found using pyaudio commands
 RATE = 44100 #set this to the sampling rate of recording device can be found using pyaudio commands
@@ -41,13 +41,7 @@ q  = deque()
 chordsls= mp.Queue()
 sm=[]
 samplesize=4
-def create_shared_block():
 
-
-    shm = shared_memory.SharedMemory(create=True, size=64)
-    # # Now create a NumPy array backed by shared memory
-    np_array = np.ndarray([64,64], dtype=np.str_, buffer=shm.buf)
-    return shm, np_array
 def calculatechords(save,chordsls):
     start_time= datetime.now()
     #    feats = feat_processor(((np.frombuffer(b''.join(save), dtype=np.int16)[::2] >> 8).astype(np.int8) + 128))
@@ -91,7 +85,7 @@ def enclosedthread(chordsls, span):
 
     print("here")
     time.sleep(span)
-    while True:
+    while stream.is_active():
         save=bytes_q
         start_time= datetime.now()
         feats = feat_processor(np.frombuffer(b''.join(save), dtype=np.int16)[::2])
