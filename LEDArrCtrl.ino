@@ -115,7 +115,7 @@ void chordAddr(byte chord[], byte strings[][6]) { //  'b' counts from 0 to 2...
           pixel = (6*(chord[i]-1)) + s*(chord[i]%2)+(6-s-1)*((chord[i]+1)%2);
           Serial.println(pixel);
           Serial.println(chord[i]);
-          switch (s) {
+          switch (s*(chord[i]%2)+(6-s-1)*((chord[i]+1)%2)) {
           case 0:
               r=255;
               g=0;
