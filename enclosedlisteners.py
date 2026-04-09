@@ -31,7 +31,7 @@ import scipy.signal as sps
 #feat_processor = madmom.features.chords.CNNChordFeatureProcessor()
 #recog_processor = madmom.features.chords.CRFChordRecognitionProcessor()
 feat_processor=DeepChromaProcessor()
-recog_processor=madmom.features.chords.DeepChromaChordRecognitionProcessor(fps=80)
+recog_processor=madmom.features.chords.DeepChromaChordRecognitionProcessor(fps=20)
 FORMAT = pyaudio.paInt16
 CHANNELS = 2#set this to the channel number of recording device can be found using pyaudio commands
 RATE = 44100 #set this to the sampling rate of recording device can be found using pyaudio commands
