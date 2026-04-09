@@ -80,6 +80,7 @@ void setup() {
 void loop() {
 byte astrin[3] = {0,0,0};
 byte emstrin[3] = {0,0,0};
+byte ebstrin[3] = {0,0,0};
 byte dmstrin[3] = {0,0,0};
 byte cstrin[3] = {0,0,0};
 Serial.println("assign chord indexes");
@@ -92,38 +93,60 @@ for(int i=0; i < 3; i++) {
   delay(1000);
   dmstrin[i] = FrtList[10][i];
   cstrin[i] = FrtList[4][i];
+  ebstrin[i] = FrtList[2][i];
 }
 Serial.println("chord indices finished");
-chordAddr(dmstrin, DmStr);
-delay(1000);
-chordAddr(cstrin, CStr);
-delay(1000);
-chordAddr(astrin, AStr);
-delay(1000);
-chordAddr(emstrin,EmStr);
-delay(1000);
-chordAddr(dmstrin, DmStr);
-delay(1000);
-chordAddr(cstrin, CStr);
-delay(1000);
-chordAddr(astrin, AStr);
-delay(1000);
-chordAddr(emstrin,EmStr);
-delay(1000);
+chordAddr(ebstrin, EbStr);
+
 }
 
 void chordAddr(byte chord[], byte strings[][6]) { //  'b' counts from 0 to 2...
   strip.clear();
   int pixel = 0;
   int start = 0;
+  int r;
+  int b;
+  int g;
+
   for(int i=0; i<3; i++) {
     if(chord[i] != 0) {
       for(int s=0; s<6; s++) {
         if(strings[i][s] == 1) {
-          pixel = (6*(chord[i]-1)) + s*(chord[i]%2)+(5-s)*((chord[i]+1)%2);
+          pixel = (6*(chord[i]-1)) + s*(chord[i]%2)+(6-s-1)*((chord[i]+1)%2);
           Serial.println(pixel);
           Serial.println(chord[i]);
-          strip.setPixelColor(pixel, 255, 0, 255);
+          switch (s) {
+          case 0:
+              r=255;
+              g=0;
+              b=0;
+              break; 
+          case 1:
+              r=255;
+              g=255;
+              b=0;
+              break;
+          case 2:
+              r=0;
+              g=0;
+              b=255;
+              break; 
+          case 3:
+              r=255;
+              g=90;
+              b=0;
+              break;
+          case 4:
+              r=0;
+              g=255;
+              b=0;
+              break; 
+          case 5:
+              r=128;
+              g=0;
+              b=128;
+          break;}
+          strip.setPixelColor(pixel,r ,g ,b );
           strip.show();
         } else {
           continue;
@@ -135,4 +158,3 @@ void chordAddr(byte chord[], byte strings[][6]) { //  'b' counts from 0 to 2...
     }
   }
 }
-
