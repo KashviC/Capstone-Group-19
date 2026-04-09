@@ -120,7 +120,7 @@ void chordAddr(byte chord[], byte strings[][6]) { //  'b' counts from 0 to 2...
     if(chord[i] != 0) {
       for(int s=0; s<6; s++) {
         if(strings[i][s] == 1) {
-          pixel = (6*(chord[i]-1)) + s;
+          pixel = (6*(chord[i]-1)) + s*(chord[i]%2)+(5-s)*((chord[i]+1)%2);
           Serial.println(pixel);
           Serial.println(chord[i]);
           strip.setPixelColor(pixel, 255, 0, 255);
