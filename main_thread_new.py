@@ -1,15 +1,31 @@
-from enclosedlisteners import * 
+from enclosedlisteners import *
+from scipy.signal import find_peaks 
+import matplotlib.pyplot as plt
 #import multiprocessing as mp
+#find_peaks(abs(np.convolve((data[:,0]),[1,1,1])), height=20, distance=0)
 #from multiprocessing import Process
 rate, data = wavfile.read("riptide.wav")
 # Calculate new number of samples
-new_rate = 44100
-new_samples = round(len(data) * new_rate / rate)
+#new_rate = 44100
+#new_samples = round(len(data) * new_rate / rate)
 # Resample
-new_data = (sps.resample(data, new_samples)).astype(np.int16).copy()
+#new_data = (sps.resample(data, new_samples)).astype(np.int16).copy()
+new_data=data
 feats = feat_processor(np.frombuffer(new_data, dtype=np.int16))
 actual = recog_processor(feats)
 threads=[]
+f=44.1e3
+procdata=(np.convolve((data[:,0]).astype(int)**2,np.ones(int(f/8))))
+procdata_subsamp=procdata[::4]
+samples=find_peaks(procdata_subsamp, height=max(procdata)*1.5/7, distance=1)*8
+tv=np.linspace(0,(len(procdata)-1)/f,len(procdata))
+samptime=samples[0]*1/f
+acls=[]
+for els in actual[:]:
+    for sample in samptime:
+        if (sample<els[1] and sample>els[0]):
+            acls.append(els[2])
+
 span=3     
 class record:
     span=3
@@ -58,9 +74,9 @@ if __name__ == '__main__':
         threads.append(Process(target=enclosedthread, args=(chordsls, 3)))
         threads[i].start()
         time.sleep(.1)
-    while True:
-        #time.sleep(.01)
-        try:
+    try:
+        while True:
+            #time.sleep(.01)
             if chordsls.qsize()>0:
                 for i in range(chordsls.qsize()):
                     #start_time= datetime.now()
@@ -73,6 +89,6 @@ if __name__ == '__main__':
                     #print(sm)
                     #print(np_array)
     
-        except:
-            print("empty")
-    audio.terminate()
+    except KeyboardInterrupt:
+        print("empty")
+        audio.terminate()
