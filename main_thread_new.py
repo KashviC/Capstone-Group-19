@@ -2,7 +2,7 @@ from enclosedlisteners import *
 import send_data
 #import multiprocessing as mp
 #from multiprocessing import Process
-rate, data = wavfile.read(("C:/Users/tisfi/Documents/capstone/riptide.wav"))
+rate, data = wavfile.read(("riptide.wav"))
 new_rate = 44100
 new_samples = round(len(data) * new_rate / rate)
 # Resample
@@ -11,9 +11,11 @@ feats = feat_processor(np.frombuffer(new_data, dtype=np.int16))
 actual = recog_processor(feats)
 threads=[]
 span=3     
+actual=["C:maj","F:min","G:maj","A:min"]
 correct = True
 breakfree = False
-
+send_data.sendChord(actual[0])
+#send_data.closePort()
 class record:
     span=3
     chords=['n']
@@ -29,10 +31,12 @@ class record:
     
     def check(self,chordin):
         chordin= "".join(send_data.cleanInput(chordin))
+        #chordin= "".join(send_data.cleanInput(chordin))
         actualsingle = rec.actualchords[0]
         if actualsingle == chordin: #correct
             print("correct chord. moving on")
-            self.chordSend = rec.actualchords.pop(0)
+            rec.actualchords.pop(0)
+            self.chordSend = rec.actualchords[0]
             return self.chordSend, True
         else: 
            # print("incorrect chord")
@@ -63,9 +67,9 @@ class record:
 if __name__ == '__main__':
     from send_data import *
     rec=record()
-    send_data.initialize() #initialize the arduino connection 
+    #send_data.initialize() #initialize the arduino connection 
 
-    rec.actualchords=send_data.cleanInput(actual)
+    rec.actualchords=actual#send_data.cleanInput(actual)
     rec.span=span
     time.sleep(1)
     #rec.manage([(0., 6.8, 'N')])
@@ -88,43 +92,25 @@ if __name__ == '__main__':
                     # start_time= datetime.now()
                     # print(start_time)
                     newchord=(chordsls.get())
-                    print("Chord detected:")
-                    print(newchord[0])
+                    #print("Chord detected:")
+                    #print(newchord[0])
                     # print("time")
                     # print(newchord[1].timestamp())
                     rec.manage(newchord)
+                    if(newchord[0][0][2]=="C:maj"):
+                        print()
                     result = rec.check(newchord)
                     #test all chords on LED display
-                    send_data.sendChord('Ab:maj')
-                    time.sleep(1)
-                    send_data.sendChord('F:min')
-                    time.sleep(1)
-                    send_data.sendChord('Eb:maj')
-                    time.sleep(1)
-                    send_data.sendChord('G:maj')
-                    time.sleep(1)
-                    send_data.sendChord('C:maj')
-                    time.sleep(1)
-                    send_data.sendChord('D:maj')
-                    time.sleep(1)
-                    send_data.sendChord('E:maj')
-                    time.sleep(1)
-                    send_data.sendChord('A:maj')
-                    time.sleep(1)
-                    send_data.sendChord('A:min')
-                    time.sleep(1)
-                    send_data.sendChord('E:min')
-                    time.sleep(1)
-                    send_data.sendChord('D:min')
-                    time.sleep(1)
+                    
+            
                     correct = True
                     if result[1]: #move onto next chord
                         print("move to next")
                         send_data.sendChord(result[0])
                         correct = True
                     else: 
-                        print("try again")
-                        send_data.sendChord(result[0])
+                        #print("try again")
+                        #send_data.sendChord(result[0])
                         correct = False
                     if len(rec.actualchords) == 0: 
                         print("DONE YOURE DONE UR FREE YAYYY")
