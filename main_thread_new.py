@@ -38,6 +38,10 @@ class record:
         else: 
            # print("incorrect chord")
             return actualsingle, False
+        
+    def returnSong():
+        #return the full song with the time stamps
+        return actual
 
     def manage(self,chordsin):
         #print("ao")
