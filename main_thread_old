@@ -1,0 +1,95 @@
+from enclosedlisteners import *
+from scipy.signal import find_peaks 
+import matplotlib.pyplot as plt
+#import send_data
+#import multiprocessing as mp
+#find_peaks(abs(np.convolve((data[:,0]),[1,1,1])), height=20, distance=0)
+#from multiprocessing import Process
+rate, data = wavfile.read("riptide.wav")
+# Calculate new number of samples
+#new_rate = 44100
+#new_samples = round(len(data) * new_rate / rate)
+# Resample
+#new_data = (sps.resample(data, new_samples)).astype(np.int16).copy()
+new_data=data
+feats = feat_processor(np.frombuffer(new_data, dtype=np.int16))
+actual = recog_processor(feats)
+threads=[]
+f=44.1e3
+procdata=(np.convolve((data[:,0]).astype(int)**2,np.ones(int(f/8))))
+procdata_subsamp=procdata[::4]
+samples=find_peaks(procdata_subsamp, height=max(procdata)*1.5/7, distance=1)*8
+tv=np.linspace(0,(len(procdata)-1)/f,len(procdata))
+samptime=samples[0]*1/f
+acls=[]
+for els in actual[:]:
+    for sample in samptime:
+        if (sample<els[1] and sample>els[0]):
+            acls.append(els[2])
+
+span=3     
+class record:
+    span=3
+    chords=['n']
+    
+    lt=datetime.now().timestamp()-span
+    fixed=lt
+    times=[0]
+    timesstart=[0]
+    def tx(self,send):
+        print("new chord sent: "+str(send))
+    def manage(self,chordsin):
+        #print("ao")
+        ct=chordsin[1].timestamp()-self.fixed
+        chordsin=chordsin[0]
+        print(ct)
+        for i in chordsin:
+            #print(i[2])
+            #print(self.chords[len(self.chords)-1])
+            index=0
+            while((ct-(self.span-i[0]))<self.times[len(self.chords)-1-index]):
+                index+=1
+            if ((i[2]==self.chords[len(self.chords)-1] and index==1)):
+                if index==1:
+                    self.times[len(self.chords)-1]=ct-(self.span-i[1])
+                #print(i[2])
+            elif(index==0):
+                #print(i)
+                self.tx(i[2])
+                self.chords.append(i[2])
+                self.times.append(ct-(self.span-i[1]))
+                self.timesstart.append(ct-(self.span-i[0]))
+        self.lt=ct
+if __name__ == '__main__':
+    rec=record()
+    rec.span=span
+    time.sleep(1)
+    #rec.manage([(0., 6.8, 'N')])
+    #rec.manage([(0,2,'N'),(2,6.8,'A')])
+    #rec.manage([(0,2,'N'),(2,6.8,'B')])
+    #rec.manage([(0,2,'C'),(2,6.8,'B')])
+    #rec.manage([(0,2,'N'),(2,6.8,'D')])
+
+    for i in range(1):
+        #enclosedthread1()
+        threads.append(Process(target=enclosedthread, args=(chordsls, 3)))
+        threads[i].start()
+        time.sleep(.1)
+    try:
+        while True:
+            #time.sleep(.01)
+            if chordsls.qsize()>0:
+                for i in range(chordsls.qsize()):
+                    #start_time= datetime.now()
+                    #print(start_time)
+                    newchord=(chordsls.get())
+                    print(newchord[0])
+                    print("time")
+                    print(newchord[1].timestamp())
+                    rec.manage(newchord)
+                    #print(sm)
+                    #print(np_array)
+    
+    except KeyboardInterrupt:
+        print("empty")
+        audio.terminate()
