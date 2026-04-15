@@ -31,9 +31,26 @@ class record:
     timesstart=[0]
     def tx(self,send):
         print("new chord sent: "+str(send))
-    
+        result = self.check(send)
+        #test all chords on LED display
+        
+
+        correct = True
+        if result[1]: #move onto next chord
+            print("move to next")
+            send_data.sendChord(result[0])
+            correct = True
+        else: 
+            #print("try again")
+            #send_data.sendChord(result[0])
+            correct = False
+        if len(rec.actualchords) == 0: 
+            print("DONE YOURE DONE UR FREE YAYYY")
+            breakfree = True
+            send_data.closePort()
     def check(self,chordin):
-        chordin= "".join(send_data.cleanInput(chordin))
+        #chordin= "".join(send_data.cleanInput(chordin))
+        
         #chordin= "".join(send_data.cleanInput(chordin))
         actualsingle = rec.actualchords[0]
         if actualsingle == chordin: #correct
@@ -100,31 +117,15 @@ if __name__ == '__main__':
                     # print(start_time)
                     newchord=(chordsls.get())
                     #print("Chord detected:")
-                    #print(newchord[0])
-                    # print("time")
+                    print(newchord[0])
+                    print("time")
                     # print(newchord[1].timestamp())
                     rec.manage(newchord)
                     if(newchord[0][0][2]=="C:maj"):
                         print()
-                    result = rec.check(newchord)
-                    #test all chords on LED display
-                    
-            
-                    correct = True
-                    if result[1]: #move onto next chord
-                        print("move to next")
-                        send_data.sendChord(result[0])
-                        correct = True
-                    else: 
-                        #print("try again")
-                        #send_data.sendChord(result[0])
-                        correct = False
-                    if len(rec.actualchords) == 0: 
-                        print("DONE YOURE DONE UR FREE YAYYY")
-                        breakfree = True
-                        send_data.closePort()
-                        break
+
     
         except:
             print("empty")
             audio.terminate()
+
