@@ -1,7 +1,10 @@
 from enclosedlisteners import *
 import send_data
+import multiprocessing as mp
+from multiprocessing import shared_memory, Process, Lock
 #import multiprocessing as mp
 #from multiprocessing import Process
+chordsls= mp.Queue()
 rate, data = wavfile.read(("riptide.wav"))
 new_rate = 44100
 new_samples = round(len(data) * new_rate / rate)
@@ -14,7 +17,7 @@ span=3
 actual=["C:maj","F:min","G:maj","A:min"]
 correct = True
 breakfree = False
-send_data.sendChord(actual[0])
+
 #send_data.closePort()
 class record:
     span=3
@@ -80,9 +83,13 @@ if __name__ == '__main__':
 
     for i in range(1):
         #enclosedthread1()
-        threads.append(threading.Thread(target=enclosedthread, args=(chordsls, 3)))
+        threads.append(Process(target=enclosedthread, args=(chordsls, 3)))
         threads[i].start()
         time.sleep(.1)
+        send_data.closePort()
+        send_data.initialize()
+        send_data.sendChord(actual[0])
+        
     while True:
         if breakfree == True: break #SEE IF THIS ACTUALLY WORKS LOL I DIDNT TEST IT IM LAZY 
         #time.sleep(.01)
