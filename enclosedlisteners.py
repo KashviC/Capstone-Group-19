@@ -93,13 +93,13 @@ def enclosedthread(chordsls, span):
         save=bytes_q
         start_time= datetime.now()
         #threshold=0#threshold*7/8+(np.max(feats)/1.2)/8
-        threshold=threshold*19/20+(np.max(feats,axis=0)/1.4)/20
+        threshold=threshold*24/25+(np.max(feats,axis=0)/1.4)/25
         #print(threshold)
         feats = feat_processor(np.frombuffer(b''.join(save), dtype=np.int16)[::2])
         #feats=CLPChroma(feats)
         #print(feats)
         #threshold=threshold*(threshold>.2)*1+.2*(threshold<.2)
-        #threshold=0
+        #threshold=.3
         chords = recog_processor(feats*((feats>threshold)*1))
         chords=[chords,datetime.now()]
         #print( datetime.now() - end1)
