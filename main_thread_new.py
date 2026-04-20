@@ -23,7 +23,9 @@ span=.2
 actual=["G:maj","D:maj","G:maj","G:maj","D:maj","G:maj","G:maj","D:maj","N"]
 #actual=["G:maj","G:maj","G:maj","G:maj","G:maj","N"]
 #actual=["A:maj","A:maj","A:maj","A:maj","A:maj","N"]
-#actual=np.repeat(['Ab:maj','F:min','Eb:maj','G:maj','C:maj','D:maj','E:maj','A:maj','A:min','E:min','D:min'],3)
+actual=list(np.repeat(['E:maj','A:maj','A:min','E:min','D:min',"N"],3))
+actual=["C:maj","E:min","C:maj","E:min","C:maj","E:min","F:maj","A:min","G:maj","D:min","A:min","C:maj","F:maj","G:maj","N"]
+#actual=list(np.repeat(['E:min',"N"],3))
 correct = True
 breakfree = False
 
@@ -134,9 +136,11 @@ if __name__ == '__main__':
                     newchord=(chordsls.get())
                     print("Chord detected:")
                     print(newchord[0])
-                    #print("time")
-                    print(newchord[1].timestamp())
+                    print("time")
+                    #print(newchord[1].timestamp())
                     if(newchord[0][0][2]=="G:maj"):
+                        print()
+                    if(newchord[0][0][2]=="E:min"):
                         print()
                     rec.manage(newchord)
 
@@ -145,4 +149,3 @@ if __name__ == '__main__':
         except:
             print("empty")
             audio.terminate()
-
