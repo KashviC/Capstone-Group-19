@@ -11,16 +11,25 @@ new_samples = round(len(data) * new_rate / rate)
 # Resample
 new_data = (sps.resample(data, new_samples)).astype(np.int16).copy()
 feats = feat_processor(np.frombuffer(new_data, dtype=np.int16))
-actual = recog_processor(feats)
+#sig=madmom.audio.signal.Signal(np.frombuffer(new_data, dtype=np.int16))
+#sig.sample_rate=44100
+
+#feats=feat_processor.process(sig)
+#feats=feats
+actual = recog_processor(feats*(feats>.7)*1)
 threads=[]
-span=3     
-actual=["C:maj","F:min","G:maj","A:min"]
+span=.2
+#actual=["C:maj","E:min","G:maj","A:min","C:maj","G:maj","N"]
+actual=["G:maj","D:maj","G:maj","G:maj","D:maj","G:maj","G:maj","D:maj","N"]
+#actual=["G:maj","G:maj","G:maj","G:maj","G:maj","N"]
+#actual=["A:maj","A:maj","A:maj","A:maj","A:maj","N"]
+#actual=np.repeat(['Ab:maj','F:min','Eb:maj','G:maj','C:maj','D:maj','E:maj','A:maj','A:min','E:min','D:min'],3)
 correct = True
 breakfree = False
 
 #send_data.closePort()
 class record:
-    span=3
+    span=.2
     chords=['n']
     actualchords =[]
     chordSend = ''
@@ -67,7 +76,9 @@ class record:
         ct=chordsin[1].timestamp()-self.fixed
         chordsin=chordsin[0]
         #print(ct)
+        pos=0
         for i in chordsin:
+            pos+=1
             #print(i[2])
             #print(self.chords[len(self.chords)-1])
             index=0
@@ -83,6 +94,11 @@ class record:
                 self.chords.append(i[2])
                 self.times.append(ct-(self.span-i[1]))
                 self.timesstart.append(ct-(self.span-i[0]))
+          #  if (pos==len(chordsin) and (i[2]!=self.chords[len(self.chords)-1])):
+           #     self.tx(i[2])
+            #    self.chords.append(i[2])
+             #   self.times.append(ct-(self.span-i[1]))
+              #  self.timesstart.append(ct-(self.span-i[0]))
         self.lt=ct
 if __name__ == '__main__':
     from send_data import *
@@ -100,7 +116,7 @@ if __name__ == '__main__':
 
     for i in range(1):
         #enclosedthread1()
-        threads.append(Process(target=enclosedthread, args=(chordsls, 3)))
+        threads.append(Process(target=enclosedthread, args=(chordsls, span)))
         threads[i].start()
         time.sleep(.1)
         send_data.closePort()
@@ -114,15 +130,16 @@ if __name__ == '__main__':
             if chordsls.qsize()>0:
                 for i in range(chordsls.qsize()):
                     # start_time= datetime.now()
-                    # print(start_time)
+                    #print(start_time)
                     newchord=(chordsls.get())
-                    #print("Chord detected:")
+                    print("Chord detected:")
                     print(newchord[0])
-                    print("time")
-                    # print(newchord[1].timestamp())
-                    rec.manage(newchord)
-                    if(newchord[0][0][2]=="C:maj"):
+                    #print("time")
+                    print(newchord[1].timestamp())
+                    if(newchord[0][0][2]=="G:maj"):
                         print()
+                    rec.manage(newchord)
+
 
     
         except:
