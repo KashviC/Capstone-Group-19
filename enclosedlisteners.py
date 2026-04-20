@@ -141,3 +141,5 @@ def threadsim(chordsls):
 #chordls=[]
 #threadsim(chordls)
 #enclosedthread(chordls,3)
+#threadsim(chordls)
+#enclosedthread(chordls,3)
