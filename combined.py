@@ -3,6 +3,7 @@ import send_data
 import multiprocessing as mp
 from multiprocessing import shared_memory, Process, Lock
 import intempomode as temp
+import asyncio
 
 #import multiprocessing as mp
 #from multiprocessing import Process
@@ -20,6 +21,7 @@ actual=["C:maj","F:min","G:maj","A:min"]
 correct = True
 breakfree = False
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+loop = None
 
 
 #---------------------------
@@ -52,7 +54,6 @@ async def sendUnity(chord):
         except:
             pass
 
-
 #send_data.closePort()
 
 class record:
@@ -70,8 +71,8 @@ class record:
         print("new chord sent: "+str(send))
         result = self.check(send)
         #test all chords on LED display
-        import asyncio
-        asyncio.run(sendUnity(send))
+        loop = asyncio.get_event_loop()
+        loop.create_task(sendUnity(result[0]))
 
         #correct = True
        # if result[1]: #move onto next chord
@@ -89,16 +90,15 @@ class record:
 
     def check(self,chordin):
         #chordin= "".join(send_data.cleanInput(chordin))
-        
         #chordin= "".join(send_data.cleanInput(chordin))
-        actualsingle = rec.actualchords[0]
+        actualsingle = self.actualchords[0]
         if actualsingle == chordin: #correct
             print("correct chord. moving on")
-            rec.actualchords.pop(0)
-            self.chordSend = rec.actualchords[0]
+            self.actualchords.pop(0)
+            self.chordSend = self.actualchords[0]
             return self.chordSend, True
         else: 
-           # print("incorrect chord")
+            # print("incorrect chord")
             return actualsingle, False
 
     def manage(self,chordsin):
@@ -134,7 +134,7 @@ def listener():
       #  send_data.closePort()
       #  send_data.initialize()
       #  send_data.sendChord(actual[0]) ------------TEMPORARILY COMMENTING OUT TO TEST INTEMPO MODE -----------
-        
+    rec = record() 
     while True:
         if breakfree == True: break
         #time.sleep(.01)
@@ -148,7 +148,7 @@ def listener():
                     print(newchord[0])
                     print("time")
                     # print(newchord[1].timestamp())
-                    temp.tempoMain(newchord) #TEMPO MODE
+                    #temp.tempoMain(newchord) #TEMPO MODE
                     rec.manage(newchord) 
         except:
             print("empty")
@@ -156,7 +156,8 @@ def listener():
 
 import threading
 @app.on_event("startup")
-def startlistening():
-    threading.Thread(target=listener,daemon = True ).start()
+async def startlistening():
+    loop = asyncio.get_running_loop()
+    threading.Thread(target=listener, daemon=True).start()
 
     
