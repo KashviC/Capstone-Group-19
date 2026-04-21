@@ -11,6 +11,7 @@ import serial.tools.list_ports
 
 #The 2nd param in this dict indicates which strings should be left open
 CHORDS = {
+    'N':'0',
     'Ab:maj':'1', 
     'F:min':'2',
     'Eb:maj':'3',
@@ -21,11 +22,13 @@ CHORDS = {
     'A:maj':'8',
     'A:min':'9',
     'E:min':'10',
-    'D:min':'11'
+    'D:min':'11',
+    'F:maj':'12'
 }
 serialinst = serial.Serial()
 portsList = []
-COM = 7 #change if needed 
+
+COM = 12 #change if needed 
 
 def initialize():
     comports = serial.tools.list_ports.comports()
@@ -42,7 +45,7 @@ def initialize():
         serialinst.baudrate = 9600
         serialinst.port = avalport
         serialinst.open()
-
+#initialize()
 def closePort(): 
     serialinst.close()
 
